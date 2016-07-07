@@ -42,6 +42,10 @@ public class Sequence {
 		this.datacenterId = datacenterId;
 	}
 
+	/**
+	 * 获取下一个ID
+	 * @return
+	 */
 	public synchronized long nextId() {
 		long timestamp = timeGen();
 		if (timestamp < lastTimestamp) {
