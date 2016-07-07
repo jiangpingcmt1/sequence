@@ -26,7 +26,6 @@ public class Sequence {
 	private long lastTimestamp = -1L;
 
 	/**
-	 * 
 	 * @param workerId
 	 * @param datacenterId
 	 */
