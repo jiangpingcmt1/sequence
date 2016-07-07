@@ -1,4 +1,4 @@
-#sequence
+#高效GUID产生算法(sequence)
 
 ##简介
 
