@@ -26,8 +26,8 @@ public class Sequence {
 	private long lastTimestamp = -1L;
 
 	/**
-	 * @param workerId
-	 * @param datacenterId
+	 * @param workerId 工作机器ID
+	 * @param datacenterId 序列号
 	 */
 	public Sequence(long workerId, long datacenterId) {
 		if (workerId > maxWorkerId || workerId < 0) {
