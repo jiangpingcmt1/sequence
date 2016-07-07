@@ -1,7 +1,9 @@
 package cn.ms.sequence;
 
+import cn.ms.sequence.common.SystemClock;
+
 /**
- * Snowflake
+ * 分布式高效有序ID生产黑科技(sequence)
  * 
  * @author lry
  */
@@ -66,7 +68,7 @@ public class Sequence {
 	}
 
 	protected long timeGen() {
-		return System.currentTimeMillis();
+		return SystemClock.now();
 	}
 
 }
