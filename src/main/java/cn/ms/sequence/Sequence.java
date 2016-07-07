@@ -25,6 +25,11 @@ public class Sequence {
 	private long sequence = 0L;
 	private long lastTimestamp = -1L;
 
+	/**
+	 * 
+	 * @param workerId
+	 * @param datacenterId
+	 */
 	public Sequence(long workerId, long datacenterId) {
 		if (workerId > maxWorkerId || workerId < 0) {
 			throw new IllegalArgumentException(
