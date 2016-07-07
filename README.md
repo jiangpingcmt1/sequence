@@ -7,7 +7,7 @@ Twitter-Snowflake算法产生的背景相当简单，为了满足Twitter每秒�
 
 性能测试数据：
 
-![Snowflake算法核心](docs/perf.png)
+![性能测试结果](docs/perf.png)
 
 ##Snowflake算法核心
 把时间戳，工作机器id，序列号组合在一起。
