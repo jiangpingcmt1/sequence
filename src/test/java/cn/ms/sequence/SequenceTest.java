@@ -3,6 +3,8 @@ package cn.ms.sequence;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Test;
+
 public class SequenceTest {
 	
 	@Test
@@ -12,6 +14,23 @@ public class SequenceTest {
 				long id = sequence.nextId();
 				System.out.println(id);
 			}
+	}
+	
+	public static void main(String[] args) {
+		Set<Long> set = new HashSet<Long>();
+		final Sequence idWorker1 = new Sequence(0, 0);
+		final Sequence idWorker2 = new Sequence(1, 0);
+		Thread t1 = new Thread(new IdWorkThread(set, idWorker1));
+		Thread t2 = new Thread(new IdWorkThread(set, idWorker2));
+		t1.setDaemon(true);
+		t2.setDaemon(true);
+		t1.start();
+		t2.start();
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	static class IdWorkThread implements Runnable {
@@ -33,21 +52,5 @@ public class SequenceTest {
 			}
 		}
 	}
-
-	public static void main(String[] args) {
-		Set<Long> set = new HashSet<Long>();
-		final Sequence idWorker1 = new Sequence(0, 0);
-		final Sequence idWorker2 = new Sequence(1, 0);
-		Thread t1 = new Thread(new IdWorkThread(set, idWorker1));
-		Thread t2 = new Thread(new IdWorkThread(set, idWorker2));
-		t1.setDaemon(true);
-		t2.setDaemon(true);
-		t1.start();
-		t2.start();
-		try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+	
 }
