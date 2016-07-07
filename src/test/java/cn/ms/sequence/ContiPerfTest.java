@@ -18,7 +18,7 @@ public class ContiPerfTest {
 	Sequence sequence = new Sequence(0, 0);
 	
 	@Test
-	@PerfTest(invocations = 1000000, threads = 16)
+	@PerfTest(invocations = 100000000, threads = 16)
 	public void test1() throws Exception {
 		sequence.nextId();
 	}
