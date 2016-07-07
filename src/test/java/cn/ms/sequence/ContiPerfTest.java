@@ -5,6 +5,11 @@ import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+/**
+ * 性能测试
+ * 
+ * @author lry
+ */
 public class ContiPerfTest {
 	
 	@Rule
