@@ -1,10 +1,28 @@
 #分布式高效ID生产黑科技(sequence)
 
+## 开源产品介绍（微服务基础设施<font color="red">QQ交流群：191958521</font>）
++ 配置中心(mconf)
+
+1. GITHUB：https://github.com/yu120/mconf
+2. 码云：https://git.oschina.net/yu120/mconf
+
++ 微核心(micro)
+
+1. GITHUB：https://github.com/yu120/micro
+2. 码云：https://git.oschina.net/yu120/micro
+
++ 微服务神经元(neural)
+
+1. GITHUB：https://github.com/yu120/neural
+2. 码云：https://git.oschina.net/yu120/neural
+
++ 微序列(sequence)
+
+1. https://git.oschina.net/yu120/sequence
+
+
 ##简介
 高效GUID产生算法(sequence),基于Snowflake实现64位自增ID算法。
-
-灵感来源于:
-+ **微服务神经元(http://git.oschina.net/yu120/neural)**
 
 Twitter-Snowflake算法产生的背景相当简单，为了满足Twitter每秒上万条消息的请求，每条消息都必须分配一条唯一的id，这些id还需要一些大致的顺序（方便客户端排序），并且在分布式系统中不同机器产生的id必须不同。
 
