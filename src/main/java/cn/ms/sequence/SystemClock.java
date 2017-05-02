@@ -1,4 +1,4 @@
-package cn.ms.sequence.common;
+package cn.ms.sequence;
 
 import java.sql.Timestamp;
 import java.util.concurrent.Executors;

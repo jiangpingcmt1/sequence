@@ -1,6 +1,5 @@
 package cn.ms.sequence;
 
-import cn.ms.sequence.common.SystemClock;
 
 /**
  * 分布式高效有序ID生产黑科技(sequence)
