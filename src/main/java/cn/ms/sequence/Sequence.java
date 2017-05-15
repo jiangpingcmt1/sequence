@@ -25,7 +25,7 @@ package cn.ms.sequence;
  */
 public class Sequence {
 
-	/** 开始时间截 (2015-01-01) */
+	/** 开始时间截 */
 	private final long twepoch = 1288834974657L;
 	/** 机器id所占的位数 */
 	private final long workerIdBits = 5L;
