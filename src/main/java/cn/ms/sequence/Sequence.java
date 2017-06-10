@@ -1,6 +1,5 @@
 package cn.ms.sequence;
 
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 基于Twitter的Snowflake算法实现分布式高效有序ID生产黑科技(sequence)
@@ -101,7 +100,6 @@ public class Sequence {
 		}
 		
 		//$NON-NLS-解决跨毫秒生成ID序列号始终为偶数的缺陷$
-		/**
 		// 如果是同一时间生成的，则进行毫秒内序列
 		if (lastTimestamp == timestamp) {
 			sequence = (sequence + 1) & sequenceMask;
@@ -113,7 +111,7 @@ public class Sequence {
 		} else {// 时间戳改变，毫秒内序列重置
 			sequence = 0L;
 		}
-		**/
+		/**
 		// 如果是同一时间生成的，则进行毫秒内序列
 		if (lastTimestamp == timestamp) {
 		    long old = sequence;
@@ -126,6 +124,7 @@ public class Sequence {
 		} else {// 时间戳改变，毫秒内序列重置
 		    sequence = ThreadLocalRandom.current().nextLong(0, 2);
 		}
+		**/
 
 		// 上次生成ID的时间截
 		lastTimestamp = timestamp;
