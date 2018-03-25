@@ -1,24 +1,11 @@
 # 分布式高效ID生产黑科技(sequence)
 
 ## 开源产品介绍（微服务基础设施<font color="red">QQ交流群：191958521</font>）
-+ 配置中心(mconf)
-
-1. GITHUB：https://github.com/yu120/mconf
-2. 码云：https://git.oschina.net/yu120/mconf
-
-+ 微核心(micro)
-
-1. GITHUB：https://github.com/yu120/micro
-2. 码云：https://git.oschina.net/yu120/micro
 
 + 微服务神经元(neural)
 
 1. GITHUB：https://github.com/yu120/neural
 2. 码云：https://git.oschina.net/yu120/neural
-
-+ 微序列(sequence)
-
-1. https://git.oschina.net/yu120/sequence
 
 
 ## 简介
