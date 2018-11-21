@@ -1,9 +1,7 @@
 package cn.ms.sequence;
 
-import java.sql.Timestamp;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -17,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * 1亿：4699,29,162.0344827586207%<p>
  * 1000万：480,12,40.0%<p>
  * 100万：50,10,5.0%<p>
+ *
  * @author lry
  */
 public class SystemClock {
@@ -39,18 +38,12 @@ public class SystemClock {
     }
 
     private void scheduleClockUpdating() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            public Thread newThread(Runnable runnable) {
-                Thread thread = new Thread(runnable, "System Clock");
-                thread.setDaemon(true);
-                return thread;
-            }
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "system-clock");
+            thread.setDaemon(true);
+            return thread;
         });
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                now.set(System.currentTimeMillis());
-            }
-        }, period, period, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(() -> now.set(System.currentTimeMillis()), period, period, TimeUnit.MILLISECONDS);
     }
 
     private long currentTimeMillis() {
@@ -60,9 +53,9 @@ public class SystemClock {
     public static long now() {
         return instance().currentTimeMillis();
     }
-    
-	public static String nowDate() {
-		return new Timestamp(instance().currentTimeMillis()).toString();
-	}
+
+    public static String nowDate() {
+        return String.valueOf(now());
+    }
 
 }
