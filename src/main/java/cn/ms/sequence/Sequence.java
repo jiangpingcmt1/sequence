@@ -185,7 +185,7 @@ public class Sequence {
     }
 
     /**
-     * 保证返回的毫秒数在参数之后(阻塞到下一个毫秒，直到获得新的时间戳)
+     * 保证返回的毫秒数在参数之后(阻塞到下一个毫秒，直到获得新的时间戳)——CAS
      *
      * @param lastTimestamp last timestamp
      * @return next millis
