@@ -87,11 +87,11 @@ public class Sequence {
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
     public Sequence(long dataCenterId) {
-        this(dataCenterId, 0x000000FF & getLastIP(), false, 5L, false);
+        this(dataCenterId, 0x000000FF & getLastIPAddress(), false, 5L, false);
     }
 
     public Sequence(long dataCenterId, boolean clock, boolean randomSequence) {
-        this(dataCenterId, 0x000000FF & getLastIP(), clock, 5L, randomSequence);
+        this(dataCenterId, 0x000000FF & getLastIPAddress(), clock, 5L, randomSequence);
     }
 
     /**
@@ -215,7 +215,7 @@ public class Sequence {
      *
      * @return last IP
      */
-    public static byte getLastIP() {
+    public static byte getLastIPAddress() {
         if (LAST_IP != 0) {
             return LAST_IP;
         }
