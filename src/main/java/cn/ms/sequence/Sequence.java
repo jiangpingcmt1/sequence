@@ -3,7 +3,7 @@ package cn.ms.sequence;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * 基于Twitter的Snowflake算法实现分布式高效有序ID生产黑科技(sequence)
+ * 基于Twitter的Snowflake算法实现分布式高效有序ID生产黑科技(sequence)——升级版Snowflake
  *
  * <br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -13,15 +13,21 @@ import java.util.concurrent.ThreadLocalRandom;
  * 1位标识，由于long基本类型在Java中是带符号的，最高位是符号位，正数是0，负数是1，所以id一般是正数，最高位是0<br>
  * <br>
  * 41位时间截(毫秒级)，注意，41位时间截不是存储当前时间的时间截，而是存储时间截的差值（当前时间截 - 开始时间截)
- * 得到的值），这里的的开始时间截，一般是我们的id生成器开始使用的时间，由我们程序来指定的（如下下面程序IdWorker类的startTime属性）。41位的时间截，可以使用69年，年T = (1L << 41) / (1000L * 60 * 60 * 24 * 365) = 69<br>
+ * 得到的值），这里的的开始时间截，一般是我们的id生成器开始使用的时间，由我们程序来指定的（如下START_TIME属性）。41位的时间截，可以使用69年，年T = (1L << 41) / (1000L * 60 * 60 * 24 * 365) = 69<br>
  * <br>
- * 10位的数据机器位，可以部署在1024个节点，包括5位datacenterId和5位workerId<br>
+ * 10位的数据机器位，可以部署在1024个节点，包括5位dataCenterId和5位workerId<br>
  * <br>
  * 12位序列，毫秒内的计数，12位的计数顺序号支持每个节点每毫秒(同一机器，同一时间截)产生4096个ID序号<br>
  * <br>
  * <br>
  * 加起来刚好64位，为一个Long型。<br>
  * SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试，SnowFlake每秒能够产生26万ID左右。
+ * <p>
+ * <p>
+ * 特性：
+ * 1.支持自定义允许时间回拨的范围<p>
+ * 2.解决跨毫秒起始值每次为0开始的情况（避免末尾必定为偶数，而不便于取余使用问题）<p>
+ * 3.解决高并发场景中获取时间戳性能问题<p>
  *
  * @author lry
  * @version 3.0
@@ -69,8 +75,8 @@ public class Sequence {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
-    private long timeOffset;
     private boolean clock;
+    private long timeOffset;
     private boolean randomSequence;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
