@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * 1.支持自定义允许时间回拨的范围<p>
  * 2.解决跨毫秒起始值每次为0开始的情况（避免末尾必定为偶数，而不便于取余使用问题）<p>
  * 3.解决高并发场景中获取时间戳性能问题<p>
+ * 4.时间回拨方案：1024个节点中分配10个点作为时间回拨序号（连续10次时间回拨的概率较小）
  *
  * @author lry
  * @version 3.0
@@ -70,6 +71,7 @@ public class Sequence {
      **/
     private final static long SEQUENCE_MASK = ~(-1L << SEQUENCE_BITS);
 
+    private long dialBackId;
     private long workerId;
     private long dataCenterId;
     private long sequence = 0L;
