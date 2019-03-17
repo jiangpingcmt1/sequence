@@ -1,5 +1,7 @@
 package cn.ms.sequence;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * 基于Twitter的Snowflake算法实现分布式高效有序ID生产黑科技(sequence)
  *
@@ -29,7 +31,7 @@ public class Sequence {
     /**
      * 起始时间戳
      **/
-    private final static long START_TIME = 1552786187353L;
+    private final static long START_TIME = 1519740777809L;
 
     /**
      * workerId占用的位数5（表示只允许workId的范围为：0-1023）
@@ -66,14 +68,20 @@ public class Sequence {
     private long dataCenterId;
     private long sequence = 0L;
     private long lastTimestamp = -1L;
-    /**
-     * 允许时间回拨的毫秒量
-     */
+
     private long timeOffset;
-    /**
-     * 是否使用定时任务解决高性能获取时间戳的问题
-     */
     private boolean clock;
+    private boolean randomSequence;
+    private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
+
+    public static void main(String[] args) throws Exception {
+        Sequence sequence = new Sequence(1L, 1);
+        for (int i = 0; i < 100; i++) {
+            Thread.sleep(1);
+            System.out.println(sequence.nextId());
+        }
+        System.out.println("===" + System.currentTimeMillis());
+    }
 
     /**
      * 简单分布式ID（不解决高并发获取时间戳的问题）
@@ -82,18 +90,19 @@ public class Sequence {
      * @param dataCenterId 数据中心ID,数据范围为0~31
      */
     public Sequence(long workerId, long dataCenterId) {
-        this(workerId, dataCenterId, false, 5L);
+        this(workerId, dataCenterId, false, 5L, false);
     }
 
     /**
      * 基于Snowflake创建分布式ID生成器
      *
-     * @param workerId     工作机器ID,数据范围为0~31
-     * @param dataCenterId 数据中心ID,数据范围为0~31
-     * @param clock        true表示解决高并发下获取时间戳的性能问题
-     * @param timeOffset   允许时间回拨的毫秒量,建议5ms
+     * @param workerId       工作机器ID,数据范围为0~31
+     * @param dataCenterId   数据中心ID,数据范围为0~31
+     * @param clock          true表示解决高并发下获取时间戳的性能问题
+     * @param timeOffset     允许时间回拨的毫秒量,建议5ms
+     * @param randomSequence true表示使用毫秒内的随机序列(超过范围则取余)
      */
-    public Sequence(long workerId, long dataCenterId, boolean clock, long timeOffset) {
+    public Sequence(long workerId, long dataCenterId, boolean clock, long timeOffset, boolean randomSequence) {
         if (workerId > MAX_WORKER_ID || workerId < 0) {
             throw new IllegalArgumentException("Worker Id can't be greater than " + MAX_WORKER_ID + " or less than 0");
         }
@@ -105,6 +114,7 @@ public class Sequence {
         this.dataCenterId = dataCenterId;
         this.clock = clock;
         this.timeOffset = timeOffset;
+        this.randomSequence = randomSequence;
     }
 
     /**
@@ -117,6 +127,7 @@ public class Sequence {
 
         // 闰秒：如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过，这个时候应当抛出异常
         if (timestamp < lastTimestamp) {
+            // 校验时间偏移回拨量
             long offset = lastTimestamp - timestamp;
             if (offset > timeOffset) {
                 throw new RuntimeException("Clock moved backwards, refusing to generate id for [" + offset + "ms]");
@@ -128,7 +139,9 @@ public class Sequence {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            // 再次获取
             timestamp = this.timeGen();
+            // 再次校验
             if (timestamp < lastTimestamp) {
                 throw new RuntimeException("Clock moved backwards, refusing to generate id for [" + offset + "ms]");
             }
@@ -136,14 +149,20 @@ public class Sequence {
 
         // 同一毫秒内序列直接自增
         if (lastTimestamp == timestamp) {
+            // randomSequence为true表示随机生成允许范围内的序列起始值并取余数,否则毫秒内起始值为0L开始自增
+            long tempSequence = sequence + 1;
+            if (randomSequence && tempSequence >= SEQUENCE_MASK) {
+                tempSequence = tempSequence % SEQUENCE_MASK;
+            }
+
             // 通过位与运算保证计算的结果范围始终是 0-4095
-            sequence = (sequence + 1) & SEQUENCE_MASK;
+            sequence = tempSequence & SEQUENCE_MASK;
             if (sequence == 0) {
                 timestamp = this.tilNextMillis(lastTimestamp);
             }
         } else {
-            // 需要解决：跨毫秒生成ID序列号第1个每次都为0的情况
-            sequence = 0L;
+            // randomSequence为true表示随机生成允许范围内的序列起始值,否则毫秒内起始值为0L开始自增
+            sequence = randomSequence ? tlr.nextLong(SEQUENCE_MASK) : 0L;
         }
 
         lastTimestamp = timestamp;
@@ -154,17 +173,12 @@ public class Sequence {
          * 3.最后转换成10进制，就是最终生成的id
          */
         return ((timestamp - START_TIME) << TIMESTAMP_LEFT_SHIFT) |
+                // 数据中心位
                 (dataCenterId << DATA_CENTER_ID_SHIFT) |
+                // 工作ID位
                 (workerId << WORKER_ID_SHIFT) |
+                // 毫秒序列化位
                 sequence;
-    }
-
-    public static void main(String[] args) {
-//        Sequence sequence = new Sequence(1, 1);
-//        for (int i = 0; i < 100; i++) {
-//            System.out.println(sequence.nextId());
-//        }
-        System.out.println(System.currentTimeMillis());
     }
 
     /**
