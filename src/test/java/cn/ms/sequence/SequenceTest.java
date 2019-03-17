@@ -7,8 +7,8 @@ public class SequenceTest {
 	
 	public static void main(String[] args) {
 		Set<Long> set = new HashSet<Long>();
-		final Sequence idWorker1 = new Sequence(0, 0);
-		final Sequence idWorker2 = new Sequence(1, 0);
+		final Sequence idWorker1 = new Sequence(0);
+		final Sequence idWorker2 = new Sequence(1);
 		Thread t1 = new Thread(new IdWorkThread(set, idWorker1));
 		Thread t2 = new Thread(new IdWorkThread(set, idWorker2));
 		t1.setDaemon(true);

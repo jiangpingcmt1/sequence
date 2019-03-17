@@ -15,7 +15,7 @@ public class ContiPerfTest {
 	@Rule
 	public ContiPerfRule i = new ContiPerfRule();
 
-	Sequence sequence = new Sequence(0, 0);
+	Sequence sequence = new Sequence(0);
 	
 	@Test
 	@PerfTest(invocations = 200000000, threads = 16)

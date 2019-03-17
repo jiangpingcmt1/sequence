@@ -1,5 +1,7 @@
 package cn.ms.sequence;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -41,24 +43,24 @@ public class Sequence {
     private final static long START_TIME = 1519740777809L;
 
     /**
-     * workerId占用的位数5（表示只允许workId的范围为：0-1023）
+     * dataCenterId占用的位数：2
      **/
-    private final static long WORKER_ID_BITS = 5L;
+    private final static long DATA_CENTER_ID_BITS = 2L;
     /**
-     * dataCenterId占用的位数：5
+     * workerId占用的位数：8
      **/
-    private final static long DATA_CENTER_ID_BITS = 5L;
+    private final static long WORKER_ID_BITS = 8L;
     /**
      * 序列号占用的位数：12（表示只允许workId的范围为：0-4095）
      **/
     private final static long SEQUENCE_BITS = 12L;
 
     /**
-     * workerId可以使用的最大数值：31
+     * workerId可以使用的最大数值：255
      **/
     private final static long MAX_WORKER_ID = ~(-1L << WORKER_ID_BITS);
     /**
-     * dataCenterId可以使用的最大数值：31
+     * dataCenterId可以使用的最大数值：3
      **/
     private final static long MAX_DATA_CENTER_ID = ~(-1L << DATA_CENTER_ID_BITS);
 
@@ -82,37 +84,29 @@ public class Sequence {
     private boolean randomSequence;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
-    public Sequence(long workerId, long dataCenterId) {
-        this(workerId, dataCenterId, false, 5L, false);
+    public Sequence(long dataCenterId) {
+        this(dataCenterId, 0x000000FF & getLastIP(), false, 5L, false);
     }
 
-    public Sequence(boolean clock, long workerId, long dataCenterId) {
-        this(workerId, dataCenterId, clock, 5L, false);
-    }
-
-    public Sequence(long workerId, long dataCenterId, boolean randomSequence) {
-        this(workerId, dataCenterId, false, 5L, randomSequence);
-    }
-
-    public Sequence(boolean clock, long workerId, long dataCenterId, boolean randomSequence) {
-        this(workerId, dataCenterId, clock, 5L, randomSequence);
+    public Sequence(long dataCenterId, boolean clock, boolean randomSequence) {
+        this(dataCenterId, 0x000000FF & getLastIP(), clock, 5L, randomSequence);
     }
 
     /**
      * 基于Snowflake创建分布式ID生成器
      *
-     * @param workerId       工作机器ID,数据范围为0~31
-     * @param dataCenterId   数据中心ID,数据范围为0~31
+     * @param dataCenterId   数据中心ID,数据范围为0~255
+     * @param workerId       工作机器ID,数据范围为0~3
      * @param clock          true表示解决高并发下获取时间戳的性能问题
      * @param timeOffset     允许时间回拨的毫秒量,建议5ms
      * @param randomSequence true表示使用毫秒内的随机序列(超过范围则取余)
      */
-    public Sequence(long workerId, long dataCenterId, boolean clock, long timeOffset, boolean randomSequence) {
-        if (workerId > MAX_WORKER_ID || workerId < 0) {
-            throw new IllegalArgumentException("Worker Id can't be greater than " + MAX_WORKER_ID + " or less than 0");
-        }
+    public Sequence(long dataCenterId, long workerId, boolean clock, long timeOffset, boolean randomSequence) {
         if (dataCenterId > MAX_DATA_CENTER_ID || dataCenterId < 0) {
             throw new IllegalArgumentException("Data Center Id can't be greater than " + MAX_DATA_CENTER_ID + " or less than 0");
+        }
+        if (workerId > MAX_WORKER_ID || workerId < 0) {
+            throw new IllegalArgumentException("Worker Id can't be greater than " + MAX_WORKER_ID + " or less than 0");
         }
 
         this.workerId = workerId;
@@ -210,6 +204,24 @@ public class Sequence {
      */
     private long timeGen() {
         return clock ? SystemClock.INSTANCE.currentTimeMillis() : System.currentTimeMillis();
+    }
+
+    /**
+     * 用ip地址最后几个字节标示
+     *
+     * @return last IP
+     */
+    private static byte getLastIP() {
+        byte lastIP = 0;
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            byte[] ipByte = ip.getAddress();
+            lastIP = ipByte[ipByte.length - 1];
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return lastIP;
     }
 
 }
