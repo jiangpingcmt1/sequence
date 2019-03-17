@@ -74,23 +74,20 @@ public class Sequence {
     private boolean randomSequence;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
-    public static void main(String[] args) throws Exception {
-        Sequence sequence = new Sequence(1L, 1);
-        for (int i = 0; i < 100; i++) {
-            Thread.sleep(1);
-            System.out.println(sequence.nextId());
-        }
-        System.out.println("===" + System.currentTimeMillis());
-    }
-
-    /**
-     * 简单分布式ID（不解决高并发获取时间戳的问题）
-     *
-     * @param workerId     工作机器ID,数据范围为0~31
-     * @param dataCenterId 数据中心ID,数据范围为0~31
-     */
     public Sequence(long workerId, long dataCenterId) {
         this(workerId, dataCenterId, false, 5L, false);
+    }
+
+    public Sequence(boolean clock, long workerId, long dataCenterId) {
+        this(workerId, dataCenterId, clock, 5L, false);
+    }
+
+    public Sequence(long workerId, long dataCenterId, boolean randomSequence) {
+        this(workerId, dataCenterId, false, 5L, randomSequence);
+    }
+
+    public Sequence(boolean clock, long workerId, long dataCenterId, boolean randomSequence) {
+        this(workerId, dataCenterId, clock, 5L, randomSequence);
     }
 
     /**
