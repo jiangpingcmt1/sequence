@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author lry
  * @version 3.0
  */
-public class Sequence {
+public final class Sequence {
 
     /**
      * 起始时间戳
