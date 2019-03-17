@@ -126,12 +126,12 @@ public class Sequence {
      * @return long
      */
     public synchronized Long nextId() {
-        long timestamp = this.timeGen();
+        long currentTimestamp = this.timeGen();
 
         // 闰秒：如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过，这个时候应当抛出异常
-        if (timestamp < lastTimestamp) {
+        if (currentTimestamp < lastTimestamp) {
             // 校验时间偏移回拨量
-            long offset = lastTimestamp - timestamp;
+            long offset = lastTimestamp - currentTimestamp;
             if (offset > timeOffset) {
                 throw new RuntimeException("Clock moved backwards, refusing to generate id for [" + offset + "ms]");
             }
@@ -143,15 +143,15 @@ public class Sequence {
                 throw new RuntimeException(e);
             }
             // 再次获取
-            timestamp = this.timeGen();
+            currentTimestamp = this.timeGen();
             // 再次校验
-            if (timestamp < lastTimestamp) {
+            if (currentTimestamp < lastTimestamp) {
                 throw new RuntimeException("Clock moved backwards, refusing to generate id for [" + offset + "ms]");
             }
         }
 
         // 同一毫秒内序列直接自增
-        if (lastTimestamp == timestamp) {
+        if (lastTimestamp == currentTimestamp) {
             // randomSequence为true表示随机生成允许范围内的序列起始值并取余数,否则毫秒内起始值为0L开始自增
             long tempSequence = sequence + 1;
             if (randomSequence && tempSequence > SEQUENCE_MASK) {
@@ -161,21 +161,22 @@ public class Sequence {
             // 通过位与运算保证计算的结果范围始终是 0-4095
             sequence = tempSequence & SEQUENCE_MASK;
             if (sequence == 0) {
-                timestamp = this.tilNextMillis(lastTimestamp);
+                currentTimestamp = this.tilNextMillis(lastTimestamp);
             }
         } else {
             // randomSequence为true表示随机生成允许范围内的序列起始值,否则毫秒内起始值为0L开始自增
             sequence = randomSequence ? tlr.nextLong(SEQUENCE_MASK + 1) : 0L;
         }
 
-        lastTimestamp = timestamp;
+        lastTimestamp = currentTimestamp;
+        long currentOffsetTime = currentTimestamp - START_TIME;
 
         /*
          * 1.左移运算是为了将数值移动到对应的段(41、5、5，12那段因为本来就在最右，因此不用左移)
          * 2.然后对每个左移后的值(la、lb、lc、sequence)做位或运算，是为了把各个短的数据合并起来，合并成一个二进制数
          * 3.最后转换成10进制，就是最终生成的id
          */
-        return ((timestamp - START_TIME) << TIMESTAMP_LEFT_SHIFT) |
+        return (currentOffsetTime << TIMESTAMP_LEFT_SHIFT) |
                 // 数据中心位
                 (dataCenterId << DATA_CENTER_ID_SHIFT) |
                 // 工作ID位
