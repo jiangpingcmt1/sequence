@@ -57,11 +57,11 @@ public class Sequence {
     private final static long SEQUENCE_BITS = 12L;
 
     /**
-     * workerId可以使用的最大数值：255
+     * workerId可以使用范围：0-255
      **/
     private final static long MAX_WORKER_ID = ~(-1L << WORKER_ID_BITS);
     /**
-     * dataCenterId可以使用的最大数值：3
+     * dataCenterId可以使用范围：0-3
      **/
     private final static long MAX_DATA_CENTER_ID = ~(-1L << DATA_CENTER_ID_BITS);
 
@@ -80,7 +80,7 @@ public class Sequence {
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
-    private boolean lastIP;
+    private static byte LAST_IP = 0;
     private boolean clock;
     private long timeOffset;
     private boolean randomSequence;
@@ -216,16 +216,19 @@ public class Sequence {
      * @return last IP
      */
     public static byte getLastIP() {
-        byte lastIP = 0;
-        try {
-            InetAddress ip = InetAddress.getLocalHost();
-            byte[] ipByte = ip.getAddress();
-            lastIP = ipByte[ipByte.length - 1];
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+        if (LAST_IP != 0) {
+            return LAST_IP;
         }
 
-        return lastIP;
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            byte[] addressByte = inetAddress.getAddress();
+            LAST_IP = addressByte[addressByte.length - 1];
+        } catch (Exception e) {
+            throw new RuntimeException("Unknown Host Exception", e);
+        }
+
+        return LAST_IP;
     }
 
 }
