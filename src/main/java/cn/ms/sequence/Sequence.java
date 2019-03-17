@@ -74,16 +74,15 @@ public final class Sequence {
      **/
     private final static long SEQUENCE_MASK = ~(-1L << SEQUENCE_BITS);
 
-    private long dialBackId;
-    private long workerId;
-    private long dataCenterId;
+    private final long workerId;
+    private final long dataCenterId;
     private long sequence = 0L;
     private long lastTimestamp = -1L;
 
     private static byte LAST_IP = 0;
-    private boolean clock;
-    private long timeOffset;
-    private boolean randomSequence;
+    private final boolean clock;
+    private final long timeOffset;
+    private final boolean randomSequence;
     private final ThreadLocalRandom tlr = ThreadLocalRandom.current();
 
     public Sequence(long dataCenterId) {
