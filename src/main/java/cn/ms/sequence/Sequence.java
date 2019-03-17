@@ -154,7 +154,7 @@ public class Sequence {
         if (lastTimestamp == timestamp) {
             // randomSequence为true表示随机生成允许范围内的序列起始值并取余数,否则毫秒内起始值为0L开始自增
             long tempSequence = sequence + 1;
-            if (randomSequence && tempSequence >= SEQUENCE_MASK) {
+            if (randomSequence && tempSequence > SEQUENCE_MASK) {
                 tempSequence = tempSequence % SEQUENCE_MASK;
             }
 
@@ -165,7 +165,7 @@ public class Sequence {
             }
         } else {
             // randomSequence为true表示随机生成允许范围内的序列起始值,否则毫秒内起始值为0L开始自增
-            sequence = randomSequence ? tlr.nextLong(SEQUENCE_MASK) : 0L;
+            sequence = randomSequence ? tlr.nextLong(SEQUENCE_MASK + 1) : 0L;
         }
 
         lastTimestamp = timestamp;
