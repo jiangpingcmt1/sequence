@@ -1,8 +1,6 @@
 package cn.ms.sequence;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -18,44 +16,26 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author lry
  */
-public class SystemClock {
+public enum SystemClock {
 
-    private final long period;
+    // ====
+
+    INSTANCE(1L, 1);
+
     private final AtomicLong now;
 
-    private SystemClock(long period) {
-        this.period = period;
+    SystemClock(long period, int corePoolSize) {
         this.now = new AtomicLong(System.currentTimeMillis());
-        scheduleClockUpdating();
-    }
-
-    private static class InstanceHolder {
-        public static final SystemClock INSTANCE = new SystemClock(1);
-    }
-
-    private static SystemClock instance() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    private void scheduleClockUpdating() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "system-clock");
-            thread.setDaemon(true);
-            return thread;
+        ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(corePoolSize, r -> {
+            Thread t = new Thread(r, "system-clock");
+            t.setDaemon(true);
+            return t;
         });
         scheduler.scheduleAtFixedRate(() -> now.set(System.currentTimeMillis()), period, period, TimeUnit.MILLISECONDS);
     }
 
-    private long currentTimeMillis() {
+    public long currentTimeMillis() {
         return now.get();
-    }
-
-    public static long now() {
-        return instance().currentTimeMillis();
-    }
-
-    public static String nowDate() {
-        return String.valueOf(now());
     }
 
 }
