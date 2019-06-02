@@ -208,7 +208,7 @@ public final class Sequence {
     }
 
     /**
-     * 用ip地址最后几个字节标示
+     * 用IP地址最后几个字节标示
      * <p>
      * eg:192.168.1.30->30
      *
