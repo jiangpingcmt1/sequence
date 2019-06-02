@@ -2,7 +2,7 @@
 
 ## 开源产品介绍（微服务基础设施<font color="red">QQ交流群：191958521</font>）
 
-+ 微服务神经元(Neural)
++ 微服务神经元(neural)
 
 1. GITHUB：https://github.com/yu120/neural
 2. 码云：https://git.oschina.net/yu120/neural
