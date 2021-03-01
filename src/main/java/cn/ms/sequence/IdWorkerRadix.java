@@ -16,8 +16,8 @@ public class IdWorkerRadix {
 
 
 
-	public static String getId(){
-		return String.valueOf(IdWorker.getId());
+	public static String getIdStr(){
+		return IdWorker.getIdStr();
 	}
 
 	public static String getBinaryId(){

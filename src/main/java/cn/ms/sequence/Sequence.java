@@ -133,7 +133,7 @@ public class Sequence {
                 }
             }
         } catch (Exception e) {
-            log.warn(" getDatacenterId: " + e.getMessage());
+            log.error(" getDatacenterId: " + e.getMessage());
         }
         return id;
     }
