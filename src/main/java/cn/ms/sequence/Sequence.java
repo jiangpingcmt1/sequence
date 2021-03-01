@@ -82,6 +82,20 @@ public class Sequence {
     /**
      * 有参构造器
      *
+     * @param datacenterId 序列号
+     */
+    public Sequence( long datacenterId) {
+
+        if(datacenterId > maxDatacenterId || datacenterId < 0) {
+            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+        }
+        this.workerId = getMaxWorkerId(datacenterId, maxWorkerId);
+        this.datacenterId = datacenterId;
+    }
+
+    /**
+     * 有参构造器
+     *
      * @param workerId     工作机器 ID
      * @param datacenterId 序列号
      */
@@ -133,6 +147,7 @@ public class Sequence {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(" getDatacenterId: " + e.getMessage());
         }
         return id;
