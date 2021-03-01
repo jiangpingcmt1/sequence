@@ -32,6 +32,9 @@ public class DefaultIdentifierGenerator implements IdentifierGenerator {
         this.sequence = new Sequence();
     }
 
+    public DefaultIdentifierGenerator(long dataCenterId) {
+        this.sequence = new Sequence(dataCenterId);
+    }
     public DefaultIdentifierGenerator(long workerId, long dataCenterId) {
         this.sequence = new Sequence(workerId, dataCenterId);
     }

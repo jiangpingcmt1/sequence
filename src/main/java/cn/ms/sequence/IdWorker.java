@@ -91,6 +91,17 @@ public class IdWorker {
         return getMillisecond() + getIdStr();
     }
 
+
+
+    /**
+     * 有参构造器
+     *
+     * @param dataCenterId 序列号
+     * @see #setIdentifierGenerator(IdentifierGenerator)
+     */
+    public static void initSequence(long dataCenterId) {
+        IDENTIFIER_GENERATOR = new DefaultIdentifierGenerator(dataCenterId);
+    }
     /**
      * 有参构造器
      *
